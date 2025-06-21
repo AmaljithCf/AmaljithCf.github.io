@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-TRF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Name - Interactive Resume</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -23,8 +24,7 @@
     <header id="hero">
         <div class="hero-content">
             <img src="placeholder-profile.jpg" alt="Your Name" class="profile-pic">
-            <!-- Add id="interactiveName" to your H1 tag -->
-            <h1 id="interactiveName">Your Name</h1>
+            <h1 id="interactiveName">Your Name</h1> {/* ID added for letter fly effect */}
             <p class="tagline" id="tagline">Creative Developer & Problem Solver</p>
             <div class="hero-emojis">
                 <span>🧑‍💻</span><span>✨</span><span>🚀</span>
@@ -101,21 +101,21 @@
             <div class="skills-grid">
                 <div class="skill-category" data-aos="fade-right">
                     <h3>Languages</h3>
-                    <div class="skill"><span>JavaScript (ES6+)</span><div class="skill-bar"><div class="skill-level js"></div></div></div>
-                    <div class="skill"><span>Python</span><div class="skill-bar"><div class="skill-level python"></div></div></div>
-                    <div class="skill"><span>HTML5 & CSS3</span><div class="skill-bar"><div class="skill-level html-css"></div></div></div>
+                    <div class="skill"><span class="skill-name">JavaScript (ES6+)</span><div class="skill-bar"><div class="skill-level" data-level="90%"></div></div></div>
+                    <div class="skill"><span class="skill-name">Python</span><div class="skill-bar"><div class="skill-level" data-level="85%"></div></div></div>
+                    <div class="skill"><span class="skill-name">HTML5 & CSS3</span><div class="skill-bar"><div class="skill-level" data-level="95%"></div></div></div>
                 </div>
                 <div class="skill-category" data-aos="fade-left">
                     <h3>Frameworks & Libraries</h3>
-                    <div class="skill"><span>React</span><div class="skill-bar"><div class="skill-level react"></div></div></div>
-                    <div class="skill"><span>Node.js</span><div class="skill-bar"><div class="skill-level node"></div></div></div>
-                    <div class="skill"><span>Django</span><div class="skill-bar"><div class="skill-level django"></div></div></div>
+                    <div class="skill"><span class="skill-name">React</span><div class="skill-bar"><div class="skill-level" data-level="80%"></div></div></div>
+                    <div class="skill"><span class="skill-name">Node.js</span><div class="skill-bar"><div class="skill-level" data-level="75%"></div></div></div>
+                    <div class="skill"><span class="skill-name">Django</span><div class="skill-bar"><div class="skill-level" data-level="70%"></div></div></div>
                 </div>
                 <div class="skill-category" data-aos="fade-right">
                     <h3>Tools & Platforms</h3>
-                    <div class="skill"><span>Git & GitHub</span><div class="skill-bar"><div class="skill-level git"></div></div></div>
-                    <div class="skill"><span>Docker</span><div class="skill-bar"><div class="skill-level docker"></div></div></div>
-                    <div class="skill"><span>AWS</span><div class="skill-bar"><div class="skill-level aws"></div></div></div>
+                    <div class="skill"><span class="skill-name">Git & GitHub</span><div class="skill-bar"><div class="skill-level" data-level="90%"></div></div></div>
+                    <div class="skill"><span class="skill-name">Docker</span><div class="skill-bar"><div class="skill-level" data-level="60%"></div></div></div>
+                    <div class="skill"><span class="skill-name">AWS</span><div class="skill-bar"><div class="skill-level" data-level="50%"></div></div></div>
                 </div>
             </div>
         </section>
@@ -154,7 +154,6 @@
             </div>
         </div>
 
-
         <section id="contact">
             <h2>Let's Connect</h2>
             <p>I'm always open to discussing new projects, creative ideas or opportunities to be part of something amazing. Feel free to reach out!</p>
@@ -163,13 +162,6 @@
                 <a href="https://linkedin.com/in/yourprofile" target="_blank" class="contact-icon"><i class="fab fa-linkedin"></i> LinkedIn</a>
                 <a href="https://github.com/yourusername" target="_blank" class="contact-icon"><i class="fab fa-github"></i> GitHub</a>
             </div>
-            <!-- Optional: Contact Form (requires backend or service like Formspree) -->
-            <!-- <form action="YOUR_FORMSPREE_ENDPOINT" method="POST">
-                <input type="text" name="name" placeholder="Your Name" required>
-                <input type="email" name="email" placeholder="Your Email" required>
-                <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
-                <button type="submit" class="cta-button">Send Message</button>
-            </form> -->
         </section>
     </main>
 
