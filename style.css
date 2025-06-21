@@ -570,3 +570,23 @@ footer p { color: var(--secondary-bg); margin-bottom: 0.5em; }
 [data-aos] {
     /* You can add global AOS customizations here if needed */
 }
+/* Letter Fly Away Effect Styles */
+#interactiveName {
+    /* Ensure the h1 itself doesn't have transitions that interfere */
+    /* It might be good to ensure it can contain the transformed spans if they overflow */
+    position: relative; /* Or ensure its parent provides a context */
+}
+
+#interactiveName .letter-span {
+    display: inline-block; /* Crucial for applying transforms */
+    position: relative; /* So z-index can work if needed, and for future effects */
+    cursor: default; /* Or a specific cursor if you prefer */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth, slightly bouncy return */
+    /* cubic-bezier(0.68, -0.55, 0.265, 1.55) is a fun "back" ease */
+    min-width: 0.2em; /* Prevents very thin letters from collapsing visually */
+}
+
+/* Optional: if you want letters to "pop" a bit more on interaction */
+#interactiveName .letter-span.interactive-hover {
+    /* Could add a slight scale or shadow here if desired, activated by JS */
+}
