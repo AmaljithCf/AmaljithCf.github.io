@@ -121,12 +121,14 @@ nav ul li a:hover, nav ul li a.active {
     color: var(--primary-bg);
     padding: 20px;
     position: relative;
+    overflow: hidden; /* Important for containing flying letters if they go too far */
 }
-.hero-content h1 {
+.hero-content h1 { /* This is #interactiveName now */
     color: var(--primary-bg);
-    font-size: 3.5rem;
+    font-size: 3.5rem; /* Adjust if needed */
     margin-bottom: 0.2em;
     animation: fadeInDown 1s ease-out;
+    /* transition: none; Remove any transitions on the h1 itself if letter effect is jumpy */
 }
 .profile-pic {
     width: 150px;
@@ -206,10 +208,28 @@ nav ul li a:hover, nav ul li a.active {
     60% { transform: translateY(-5px); }
 }
 
+/* Letter Fly Away Effect Styles */
+#interactiveName {
+    position: relative; /* Context for letter spans */
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+}
+
+#interactiveName .letter-span {
+    display: inline-block;
+    position: relative;
+    cursor: default;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    min-width: 0.1em; /* For very thin letters like 'i' or 'l' */
+    will-change: transform; /* Hint to browser for optimization */
+}
+
+
 /* About Section */
 #about { background-color: var(--secondary-bg); }
 .about-container {
-    display: flex; /* Can use for image + text layout later */
+    display: flex;
     gap: 30px;
     align-items: flex-start;
 }
@@ -250,7 +270,7 @@ nav ul li a:hover, nav ul li a.active {
     bottom: 0;
     left: 50%;
     margin-left: -2px;
-    z-index: -1; /* Behind items */
+    z-index: 0; /* Behind items, ensure icons are above */
 }
 .timeline-item {
     padding: 10px 40px;
@@ -258,16 +278,14 @@ nav ul li a:hover, nav ul li a.active {
     background-color: inherit;
     width: 50%;
 }
-/* Place items on left and right */
 .timeline-item:nth-child(odd) { left: 0; }
 .timeline-item:nth-child(even) { left: 50%; }
 
-/* The circle on the timeline */
 .timeline-icon {
     position: absolute;
     width: 50px;
     height: 50px;
-    right: -25px; /* Adjust for odd/even */
+    right: -27px; /* (50px width + 4px border*2)/2 - 2px half line width = 27px */
     background-color: var(--primary-bg);
     border: 4px solid var(--accent-color);
     top: 20px;
@@ -280,7 +298,7 @@ nav ul li a:hover, nav ul li a.active {
     color: var(--accent-color);
 }
 .timeline-item:nth-child(even) .timeline-icon {
-    left: -25px;
+    left: -27px;
 }
 
 .timeline-content {
@@ -289,9 +307,6 @@ nav ul li a:hover, nav ul li a.active {
     position: relative;
     border-radius: var(--border-radius);
     box-shadow: var(--card-shadow);
-}
-.timeline-item:nth-child(even) .timeline-content {
-    /* If you want arrows pointing to the line */
 }
 .timeline-date {
     font-family: var(--font-accent);
@@ -346,7 +361,7 @@ nav ul li a:hover, nav ul li a.active {
 .skill {
     margin-bottom: 15px;
 }
-.skill span {
+.skill .skill-name { /* Changed from just span to .skill-name */
     display: block;
     margin-bottom: 5px;
     font-weight: 600;
@@ -361,20 +376,9 @@ nav ul li a:hover, nav ul li a.active {
     height: 100%;
     background-color: var(--accent-color);
     border-radius: 5px;
-    width: 0; /* Will be set by JS or inline style if static */
+    width: 0; /* Will be set by JS */
     transition: width 1s ease-in-out;
 }
-/* Example fixed skill levels (can be dynamic with JS) */
-.skill-level.js { width: 90%; }
-.skill-level.python { width: 85%; }
-.skill-level.html-css { width: 95%; }
-.skill-level.react { width: 80%; }
-.skill-level.node { width: 75%; }
-.skill-level.django { width: 70%; }
-.skill-level.git { width: 90%; }
-.skill-level.docker { width: 60%; }
-.skill-level.aws { width: 50%; }
-
 
 /* Projects Section */
 .projects-grid {
@@ -432,8 +436,8 @@ nav ul li a:hover, nav ul li a.active {
     height: 100%;
     overflow: auto;
     background-color: rgba(0,0,0,0.6); /* Dim background */
-    align-items: center; /* For JS to use flex */
-    justify-content: center; /* For JS to use flex */
+    align-items: center; 
+    justify-content: center;
 }
 .modal-content {
     background-color: var(--primary-bg);
@@ -499,21 +503,6 @@ nav ul li a:hover, nav ul li a.active {
     transform: translateY(-3px);
     color: var(--accent-color);
 }
-/* Basic form styling (if you use it) */
-#contact form {
-    max-width: 600px;
-    margin: 30px auto 0;
-    display: grid;
-    gap: 15px;
-}
-#contact input, #contact textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: var(--border-radius);
-    font-family: var(--font-body);
-}
-#contact button { width: auto; justify-self: center; }
 
 /* Footer */
 footer {
@@ -551,42 +540,22 @@ footer p { color: var(--secondary-bg); margin-bottom: 0.5em; }
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-    h1 { font-size: 2.5rem; }
-    .hero-content h1 { font-size: 2.8rem; }
+    h1 { font-size: 2.5rem; } /* Base H1 size */
+    .hero-content h1 { font-size: 2.8rem; } /* Specific for Hero H1 */
     .tagline { font-size: 1.2rem; }
     nav ul { flex-direction: column; align-items: center; }
     nav ul li { margin: 8px 0; }
 
-    .timeline::after { left: 25px; /* Adjust central line for mobile */ }
+    .timeline::after { left: 27px; /* Adjust central line for mobile, match icon position logic */ }
     .timeline-item { width: 100%; padding-left: 70px; padding-right: 15px; } /* All items on one side */
     .timeline-item:nth-child(even) { left: 0%; } /* Reset for mobile */
-    .timeline-icon { left: 0px; /* Position icon to the left */ }
+    .timeline-icon { left: 2px; /* Position icon to the left: (50px icon + 8px border)/2 - 2px (half line) - padding-left */ }
+
 
     .skills-grid, .projects-grid { grid-template-columns: 1fr; } /* Stack cards */
     .modal-content { width: 95%; padding: 20px; }
 }
 
-/* AOS (Animate on Scroll) default is to fade up - this is just to show it's here */
 [data-aos] {
-    /* You can add global AOS customizations here if needed */
-}
-/* Letter Fly Away Effect Styles */
-#interactiveName {
-    /* Ensure the h1 itself doesn't have transitions that interfere */
-    /* It might be good to ensure it can contain the transformed spans if they overflow */
-    position: relative; /* Or ensure its parent provides a context */
-}
-
-#interactiveName .letter-span {
-    display: inline-block; /* Crucial for applying transforms */
-    position: relative; /* So z-index can work if needed, and for future effects */
-    cursor: default; /* Or a specific cursor if you prefer */
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth, slightly bouncy return */
-    /* cubic-bezier(0.68, -0.55, 0.265, 1.55) is a fun "back" ease */
-    min-width: 0.2em; /* Prevents very thin letters from collapsing visually */
-}
-
-/* Optional: if you want letters to "pop" a bit more on interaction */
-#interactiveName .letter-span.interactive-hover {
-    /* Could add a slight scale or shadow here if desired, activated by JS */
+    /* Global AOS customizations if needed */
 }
