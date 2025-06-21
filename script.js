@@ -1,13 +1,85 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Initialize AOS (Animate On Scroll) ---
     AOS.init({
-        duration: 800, // values from 0 to 3000, with step 50ms
-        easing: 'ease-in-out', // default easing for AOS animations
-        once: true, // whether animation should happen only once - while scrolling down
-        mirror: false, // whether elements should animate out while scrolling past them
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true,
+        mirror: false,
     });
 
-    // --- Typewriter Effect for Tagline (Optional) ---
+    // --- Letter Fly Away Effect Function ---
+    function setupLetterFlyAwayEffect(selector, interactionElementSelector) {
+        const textElement = document.querySelector(selector);
+        const interactionElement = document.querySelector(interactionElementSelector);
+
+        if (!textElement || !interactionElement) {
+            console.warn("Letter fly away effect: Target or interaction element not found.");
+            return;
+        }
+
+        const originalText = textElement.textContent;
+        textElement.innerHTML = ''; // Clear original text
+
+        const letters = originalText.split('');
+        const letterSpans = [];
+
+        letters.forEach(char => {
+            const span = document.createElement('span');
+            span.textContent = char;
+            span.className = 'letter-span';
+            if (char.trim() === '') { // Handle spaces to maintain layout
+                span.style.minWidth = '0.3em'; // Adjust as needed for font
+                // Alternatively, use   but spans are better for styling:
+                // span.innerHTML = ' ';
+            }
+            textElement.appendChild(span);
+            letterSpans.push(span);
+        });
+
+        const INTERACTION_RADIUS = 120; // How close the mouse needs to be (px)
+        const REPEL_STRENGTH = 60;   // How far the letters fly (px)
+        const ROTATION_STRENGTH = 30; // Max rotation (degrees)
+
+        interactionElement.addEventListener('mousemove', (e) => {
+            // Get mouse position relative to the viewport
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            letterSpans.forEach(span => {
+                const rect = span.getBoundingClientRect();
+                const spanCenterX = rect.left + rect.width / 2;
+                const spanCenterY = rect.top + rect.height / 2;
+
+                const deltaX = spanCenterX - mouseX;
+                const deltaY = spanCenterY - mouseY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+                if (distance < INTERACTION_RADIUS) {
+                    const angle = Math.atan2(deltaY, deltaX);
+                    const repelFactor = (INTERACTION_RADIUS - distance) / INTERACTION_RADIUS;
+                    const moveX = Math.cos(angle) * REPEL_STRENGTH * repelFactor;
+                    const moveY = Math.sin(angle) * REPEL_STRENGTH * repelFactor;
+                    const rotation = (Math.random() - 0.5) * 2 * ROTATION_STRENGTH * repelFactor;
+
+                    span.style.transform = `translate(${moveX}px, ${moveY}px) rotate(${rotation}deg)`;
+                } else {
+                    span.style.transform = 'translate(0, 0) rotate(0deg)';
+                }
+            });
+        });
+
+        interactionElement.addEventListener('mouseleave', () => {
+            letterSpans.forEach(span => {
+                span.style.transform = 'translate(0, 0) rotate(0deg)';
+            });
+        });
+    }
+
+    // --- Call the Letter Fly Away Effect ---
+    setupLetterFlyAwayEffect('#interactiveName', '#hero');
+
+
+    // --- Typewriter Effect for Tagline ---
     const taglineEl = document.getElementById('tagline');
     if (taglineEl) {
         const text = taglineEl.innerText;
@@ -20,8 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(typeWriter, 70); // Adjust speed
             }
         }
-        // Start after hero text animation
-        setTimeout(typeWriter, 1200); // Delay to match CSS animation
+        setTimeout(typeWriter, 1200); // Delay to sync with hero animations
     }
 
 
@@ -45,40 +116,33 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Skill Bar Animation on Scroll (Basic Implementation) ---
-    // More robust with Intersection Observer, but AOS can handle visibility for trigger
-    // This example animates them once AOS makes them visible
+    // --- Skill Bar Animation on Scroll ---
     const skillLevels = document.querySelectorAll('.skill-level');
-    skillLevels.forEach(skill => {
-        // This relies on AOS adding 'aos-animate' class when element is in view
-        // We need a way to check if it's already animated if not using once:true in AOS
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    skill.style.width = skill.classList[1] ? getSkillWidth(skill.classList[1]) : '0%';
-                    observer.unobserve(skill); // Animate only once
-                }
-            });
-        }, { threshold: 0.5 }); // Trigger when 50% visible
-        observer.observe(skill.parentElement); // Observe the container
-    });
+    const animateSkillBar = (skillBarElement) => {
+        const level = skillBarElement.dataset.level;
+        if (level) {
+            skillBarElement.style.width = level;
+        }
+    };
 
-    function getSkillWidth(className) {
-        // This is a bit manual; you'd map class names to percentages
-        // Or better, store percentage in a data-attribute on the element
-        const widths = {
-            'js': '90%', 'python': '85%', 'html-css': '95%',
-            'react': '80%', 'node': '75%', 'django': '70%',
-            'git': '90%', 'docker': '60%', 'aws': '50%'
-        };
-        return widths[className] || '0%';
-    }
+    const skillObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateSkillBar(entry.target);
+                observer.unobserve(entry.target); // Animate only once
+            }
+        });
+    }, { threshold: 0.5 }); // Trigger when 50% visible
+
+    skillLevels.forEach(skill => {
+        skillObserver.observe(skill);
+    });
 
 
     // --- Project Modal Functionality ---
     const projectCards = document.querySelectorAll('.project-card');
     const modal = document.getElementById('projectModal');
-    const closeBtn = document.querySelector('.close-btn');
+    const closeBtn = document.querySelector('.modal .close-btn'); // More specific selector for close button
 
     const modalImage = document.getElementById('modalImage');
     const modalTitle = document.getElementById('modalTitle');
@@ -90,12 +154,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dummy project data (replace with your actual project details)
     const projectData = {
         project1: {
-            image: "placeholder-project-large.jpg", // Larger image for modal
+            image: "placeholder-project-large.jpg",
             title: "Awesome Project Title - In Depth",
             description: "This is a more detailed explanation of the Awesome Project. It involved complex problem-solving and resulted in a highly scalable and efficient application. Users love its intuitive interface and robust feature set.",
             technologies: "React, Node.js, Express, MongoDB, AWS S3",
-            liveLink: "#", // Replace with actual link
-            repoLink: "#"  // Replace with actual link
+            liveLink: "#",
+            repoLink: "#"
         },
         project2: {
             image: "placeholder-project-large.jpg",
@@ -105,7 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
             liveLink: "#",
             repoLink: "#"
         }
-        // Add more projects here, matching data-project-id
     };
 
     projectCards.forEach(card => {
@@ -118,14 +181,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalTitle.textContent = data.title;
                 modalDescription.textContent = data.description;
                 modalTech.textContent = data.technologies;
+                
                 modalLiveLink.href = data.liveLink || '#';
+                modalLiveLink.style.display = (data.liveLink && data.liveLink !== "#") ? 'inline-block' : 'none';
+                
                 modalRepoLink.href = data.repoLink || '#';
+                modalRepoLink.style.display = (data.repoLink && data.repoLink !== "#") ? 'inline-block' : 'none';
 
-                modalLiveLink.style.display = data.liveLink && data.liveLink !== "#" ? 'inline-block' : 'none';
-                modalRepoLink.style.display = data.repoLink && data.repoLink !== "#" ? 'inline-block' : 'none';
-
-                modal.style.display = "flex"; // Use flex to center
-                document.body.style.overflow = 'hidden'; // Prevent background scroll
+                modal.style.display = "flex";
+                document.body.style.overflow = 'hidden';
             }
         });
     });
@@ -137,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Close modal if user clicks outside of it
     window.addEventListener('click', (event) => {
         if (event.target == modal) {
             modal.style.display = "none";
@@ -145,21 +208,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Smooth Scrolling for Nav Links (already handled by CSS scroll-behavior: smooth) ---
     // --- Active Nav Link Highlighting on Scroll ---
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('nav ul li a');
+    const navHeight = document.querySelector('nav') ? document.querySelector('nav').offsetHeight : 60;
+
 
     window.addEventListener('scroll', () => {
         let current = '';
         sections.forEach(section => {
             const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            // Adjust offset if you have a fixed nav bar
-            if (pageYOffset >= (sectionTop - sectionHeight / 3 - 60)) { // 60 for nav height
+            // const sectionHeight = section.clientHeight; // Not always needed for this logic
+            if (pageYOffset >= (sectionTop - navHeight - 50)) { // 50 is an additional offset buffer
                 current = section.getAttribute('id');
             }
         });
+        
+        // If scrolled to the very top, make "Home" active
+        if (pageYOffset < (document.getElementById('hero').offsetHeight / 2) ) {
+            current = 'hero';
+        }
+
 
         navLinks.forEach(link => {
             link.classList.remove('active');
@@ -170,10 +239,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Back to top button visibility
         const backToTopButton = document.querySelector('.back-to-top');
-        if (window.scrollY > 300) {
-            backToTopButton.classList.add('visible');
-        } else {
-            backToTopButton.classList.remove('visible');
+        if (backToTopButton) { // Check if element exists
+            if (window.scrollY > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
         }
     });
 
